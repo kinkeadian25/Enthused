@@ -48,6 +48,17 @@ export default function PostsForm({ createPost }: Props) {
     }
   };
 
+  const handleReset = () => {
+    setTitle("");
+    setSummary("");
+    setCategory("");
+    setEditorState(EditorState.createEmpty());
+  };
+
+  const handleCancel = () => {
+    
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <form
@@ -88,7 +99,7 @@ export default function PostsForm({ createPost }: Props) {
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
             required
-          ></textarea>
+          />
         </div>
         <div className="mb-4">
           <label
@@ -124,10 +135,24 @@ export default function PostsForm({ createPost }: Props) {
         </div>
         <div className="flex justify-end">
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
+            type="button"
+            onClick={handleCancel}
+          > 
+            Cancel
+          </button>
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
+            type="button"
+            onClick={handleReset}
+          >
+            Reset
+          </button>
+          <button
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
           >
-            Create
+            Publish
           </button>
         </div>
       </form>
