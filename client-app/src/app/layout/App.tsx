@@ -16,7 +16,7 @@ function App() {
   return (
     <div className="App">
         <NavBar />
-        \<PostsDashboard posts={posts} />
+        <PostsDashboard posts={posts} />
     </div>
   );
 }
