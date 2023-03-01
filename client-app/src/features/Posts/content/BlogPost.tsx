@@ -1,11 +1,16 @@
 import React from "react";
 import { Post } from "../../../app/models/post";
+import { convertFromRaw } from 'draft-js';
+import { stateToHTML } from 'draft-js-export-html';
 
 interface Props {
   post: Post;
 }
 
 export default function BlogPost({ post }: Props) {
+  const contentState = convertFromRaw(JSON.parse(post.content));
+  const contentHtml = stateToHTML(contentState);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <article>
@@ -19,13 +24,13 @@ export default function BlogPost({ post }: Props) {
               src="https://images.unsplash.com/photo-1602525905328-bf40e1a78863?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fGJsOGluZ3xlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
               alt="Avatar"
             />
-            <div className="text-sm text-gray-600">{post.date}</div>
+            <div className="text-sm text-gray-600">{post.date.split("T")[0]}</div>
           </div>
         </header>
-        <div
-          className="mt-6 prose prose-indigo prose-lg text-gray-500"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+        <div className="mt-6 text-gray-700">
+          <p>{post.summary}</p>
+        </div>
+        <div className="mt-6 text-gray-700" dangerouslySetInnerHTML={{ __html: contentHtml }}></div>
         <footer className="mt-8">
           <div className="border-t border-gray-200 pt-4 pb-3">
             <div className="flex justify-end">
@@ -41,4 +46,4 @@ export default function BlogPost({ post }: Props) {
       </article>
     </div>
   );
-};
+}

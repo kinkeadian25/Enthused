@@ -6,13 +6,16 @@ import PostList from "./PostList";
 
 interface Props {
   posts: Post[];
+  selectedPost: Post | undefined;
+  selectPost: (id: string) => void;
+  cancelSelectPost: () => void;
 }
 
-export default function PostsDashboard({ posts }: Props) {
+export default function PostsDashboard({ posts, selectedPost, selectPost, cancelSelectPost }: Props) {
   return (
     <>
-    <PostList posts={posts} />
-    {posts[0] && <BlogPost post={posts[0]} />}
+    <PostList posts={posts} selectPost={selectPost} />
+    {selectedPost && <BlogPost post={selectedPost} />}
     <PostsForm createPost={function (post: Post): Promise<void> {
         throw new Error("Function not implemented.");
       } } />
