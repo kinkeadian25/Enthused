@@ -4,9 +4,10 @@ import { Post } from "../../../app/models/post";
 interface Props {
   posts: Post[];
   selectPost: (id: string) => void;
+  deletePost: (id: string) => void;
 }
 
-export default function PostList({ posts, selectPost }: Props) {
+export default function PostList({ posts, selectPost, deletePost }: Props) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex justify-center">
@@ -57,6 +58,9 @@ export default function PostList({ posts, selectPost }: Props) {
                             </div>
                           </div>
                         </dd>
+                        <button onClick={() => deletePost(post.id)} className="mt-2 text-sm text-red-500 hover:text-red-700">
+                          Delete
+                        </button>
                       </dl>
                     </div>
                   </div>

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { convertToRaw, EditorState } from "draft-js";
+import React, { useEffect, useState } from "react";
+import { convertFromRaw, convertToRaw, EditorState } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import axios from "axios";
@@ -8,13 +8,25 @@ import { v4 as uuid } from "uuid";
 
 interface Props {
   createPost: (post: Post) => Promise<void>;
+  closeForm: () => void;
+  post: Post | undefined;
 }
 
-export default function PostsForm({ createPost }: Props) {
+export default function PostsForm({ createPost, closeForm, post }: Props) {
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [category, setCategory] = useState("");
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
+
+  useEffect(() => {
+    if (post) {
+      setTitle(post.title);
+      setSummary(post.summary);
+      setCategory(post.category);
+      const contentState = convertFromRaw(JSON.parse(post.content));
+      setEditorState(EditorState.createWithContent(contentState));
+    }
+  }, [post]);
 
   const handleEditorStateChange = (editorState: EditorState) => {
     setEditorState(editorState);
@@ -25,24 +37,33 @@ export default function PostsForm({ createPost }: Props) {
     const contentState = editorState.getCurrentContent();
     const content = JSON.stringify(convertToRaw(contentState));
     const date = new Date().toISOString();
-    const post: Post = {
+    const id = post ? post.id : uuid();
+    const newPost: Post = {
       title,
       summary,
       content,
       category,
       date,
-      id: uuid(),
+      id,
     };
     try {
-      const response = await axios.post<Post>(
-        "http://localhost:5000/api/posts",
-        post
-      );
-      await createPost(response.data);
+      if (post) {
+        await axios.put<Post>(
+          `http://localhost:5000/api/posts/${post.id}`,
+          newPost
+        );
+      } else {
+        const response = await axios.post<Post>(
+          "http://localhost:5000/api/posts",
+          newPost
+        );
+        await createPost(response.data);
+      }
       setTitle("");
       setSummary("");
       setCategory("");
       setEditorState(EditorState.createEmpty());
+      closeForm();
     } catch (error) {
       console.log(error);
     }
@@ -55,10 +76,6 @@ export default function PostsForm({ createPost }: Props) {
     setEditorState(EditorState.createEmpty());
   };
 
-  const handleCancel = () => {
-    
-  };
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <form
@@ -66,7 +83,7 @@ export default function PostsForm({ createPost }: Props) {
         onSubmit={handleSubmit}
       >
         <h1 className="text-2xl font-semibold text-gray-900 mb-4">
-          Create a new blog post
+          {post ? "Edit" : "Create"} a blog post
         </h1>
         <div className="mb-4">
           <label
@@ -82,7 +99,6 @@ export default function PostsForm({ createPost }: Props) {
             placeholder="Enter title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            required
           />
         </div>
         <div className="mb-4">
@@ -92,13 +108,13 @@ export default function PostsForm({ createPost }: Props) {
           >
             Summary
           </label>
-          <textarea
+          <input
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="summary"
+            type="text"
             placeholder="Enter summary"
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
-            required
           />
         </div>
         <div className="mb-4">
@@ -115,7 +131,6 @@ export default function PostsForm({ createPost }: Props) {
             placeholder="Enter category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            required
           />
         </div>
         <div className="mb-4">
@@ -137,25 +152,27 @@ export default function PostsForm({ createPost }: Props) {
           <button
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
             type="button"
-            onClick={handleCancel}
-          > 
-            Cancel
-          </button>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
-            type="button"
             onClick={handleReset}
           >
             Reset
           </button>
           <button
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
           >
-            Publish
+            Submit
+          </button>
+          <button
+            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2"
+            type="button"
+            onClick={closeForm}
+          >
+            Cancel
           </button>
         </div>
       </form>
     </div>
   );
 }
+
+

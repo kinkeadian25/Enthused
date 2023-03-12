@@ -7,6 +7,8 @@ import PostsDashboard from '../../features/Posts/dashboard/PostDashboard';
 function App() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
+  const [editMode, setEditMode] = useState(false);
+  const [deletePost, setDeletePost] = useState(false);
 
   useEffect(() => {
     axios.get<Post[]>('http://localhost:5000/api/posts').then(response => {
@@ -22,14 +24,34 @@ function App() {
     setSelectedPost(undefined);
   }
 
+  function handleFormOpen(id?: string) {
+    id ? handleSelectPost(id) : handleCancelSelectPost();
+    setEditMode(true);
+  }
+
+  function handleFormClose() {
+    setEditMode(false);
+  }
+
+  function handleDeletePost(id: string) {
+    setDeletePost(true);
+    axios.delete(`http://localhost:5000/api/posts/${id}`).then(() => {
+      setPosts([...posts.filter(x => x.id !== id)]);
+    })
+  }
+
   return (
     <div className="App">
-        <NavBar />
+        <NavBar openForm={handleFormOpen} />
         <PostsDashboard 
         posts={posts} 
         selectedPost={selectedPost}
         selectPost={handleSelectPost}
         cancelSelectPost={handleCancelSelectPost}
+        editMode={editMode}
+        openForm={handleFormOpen}
+        closeForm={handleFormClose}
+        deletePost={handleDeletePost}
         />
     </div>
   );

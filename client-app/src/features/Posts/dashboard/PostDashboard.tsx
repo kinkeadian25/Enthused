@@ -9,16 +9,25 @@ interface Props {
   selectedPost: Post | undefined;
   selectPost: (id: string) => void;
   cancelSelectPost: () => void;
+  editMode: boolean;
+  openForm: (id?: string) => void;
+  closeForm: () => void;
+  deletePost: (id: string) => void;
 }
 
-export default function PostsDashboard({ posts, selectedPost, selectPost, cancelSelectPost }: Props) {
+export default function PostsDashboard({ posts, selectedPost, selectPost, cancelSelectPost, editMode, closeForm, openForm, deletePost }: Props) {
   return (
     <>
-    <PostList posts={posts} selectPost={selectPost} />
-    {selectedPost && <BlogPost post={selectedPost} />}
-    <PostsForm createPost={function (post: Post): Promise<void> {
+    <PostList posts={posts} selectPost={selectPost} deletePost={deletePost}/>
+    {selectedPost && !editMode &&
+    <BlogPost 
+    post={selectedPost} 
+    cancelSelectPost={cancelSelectPost} 
+    openForm={openForm}
+    />}
+    {editMode && <PostsForm closeForm={closeForm} post={selectedPost} createPost={function (post: Post): Promise<void> {
         throw new Error("Function not implemented.");
-      } } />
+      } } />}
     </>
   );
 }

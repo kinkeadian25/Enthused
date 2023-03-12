@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 
-export default function NavBar() {
+interface Props {
+  openForm: () => void;
+}
+
+export default function NavBar({ openForm }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -24,9 +28,9 @@ export default function NavBar() {
               <a href="/about" className="text-gray-600 hover:text-gray-900">
                 About
               </a>
-              <a href="/blog" className="text-gray-600 hover:text-gray-900">
-                Blog
-              </a>
+              <button onClick={openForm} className="text-gray-600 hover:text-gray-900">
+                Create Blog
+              </button>
               <a href="/profile" className="text-gray-600 hover:text-gray-900">
                 Profile
               </a>
