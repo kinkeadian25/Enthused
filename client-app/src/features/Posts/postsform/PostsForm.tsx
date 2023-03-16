@@ -7,12 +7,13 @@ import { Post } from "../../../app/models/post";
 import { v4 as uuid } from "uuid";
 
 interface Props {
-  createPost: (post: Post) => Promise<void>;
+  createOrEditPost: (post: Post) => void;
   closeForm: () => void;
   post: Post | undefined;
+  submitting: boolean;
 }
 
-export default function PostsForm({ createPost, closeForm, post }: Props) {
+export default function PostsForm({ createOrEditPost, closeForm, post }: Props) {
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [category, setCategory] = useState("");
@@ -47,18 +48,7 @@ export default function PostsForm({ createPost, closeForm, post }: Props) {
       id,
     };
     try {
-      if (post) {
-        await axios.put<Post>(
-          `http://localhost:5000/api/posts/${post.id}`,
-          newPost
-        );
-      } else {
-        const response = await axios.post<Post>(
-          "http://localhost:5000/api/posts",
-          newPost
-        );
-        await createPost(response.data);
-      }
+      await createOrEditPost(newPost);
       setTitle("");
       setSummary("");
       setCategory("");
