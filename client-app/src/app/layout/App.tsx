@@ -7,6 +7,7 @@ import agent from '../api/agent';
 import LoadingComponent from './LoadingComponent';
 import { v4 as uuid } from 'uuid';
 import { useStore } from '../stores/store';
+import { observer } from 'mobx-react-lite';
 
 function App() {
 const {postStore} = useStore();
@@ -19,16 +20,8 @@ const {postStore} = useStore();
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    agent.Posts.list().then(response => {
-      let posts: Post[] = [];
-      response.forEach(post => {
-        post.date = post.date.split('T')[0];
-        posts.push(post);
-      })
-      setPosts(posts);
-      setLoading(false);
-    })
-  }, [])
+    postStore.loadPosts();
+  }, [postStore])
 
   function handleSelectPost(id: string) {
     setSelectedPost(posts.find(x => x.id === id));
@@ -75,25 +68,25 @@ const {postStore} = useStore();
     })
   }
 
-  if (loading) return <LoadingComponent content=''/>
+  if (postStore.loadingInitial) return <LoadingComponent content=''/>
 
   return (
     <div className="App">
         <NavBar openForm={handleFormOpen} />
         <PostsDashboard 
-        posts={posts} 
+        posts={postStore.posts} 
         selectedPost={selectedPost}
         selectPost={handleSelectPost}
         cancelSelectPost={handleCancelSelectPost}
         editMode={editMode}
         openForm={handleFormOpen}
         closeForm={handleFormClose}
+        createOrEditPost={handleCreateOrEditPost}
         deletePost={handleDeletePost}
         submitting={submitting}
-        createOrEditPost={handleCreateOrEditPost}
         />
     </div>
   );
 }
 
-export default App;
+export default observer(App);
