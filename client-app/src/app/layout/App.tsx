@@ -6,8 +6,11 @@ import PostsDashboard from '../../features/Posts/dashboard/PostDashboard';
 import agent from '../api/agent';
 import LoadingComponent from './LoadingComponent';
 import { v4 as uuid } from 'uuid';
+import { useStore } from '../stores/store';
 
 function App() {
+const {postStore} = useStore();
+
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
   const [editMode, setEditMode] = useState(false);
