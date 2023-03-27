@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import React, { useState, SyntheticEvent } from "react";
+import { NavLink } from "react-router-dom";
 import { useStore } from "../../../app/stores/store";
 
 export default observer(function PostList() {
@@ -42,7 +43,7 @@ export default observer(function PostList() {
                         />
                       </svg>
                     </div>
-                    <div className="ml-5 w-0 flex-1" onClick={() => postStore.selectPost(post.id)}>
+                    <NavLink to={`/posts/${post.id}`} className="ml-5 w-0 flex-1" >
                       <dl>
                         <dt className="text-lg font-medium text-gray-500 truncate hover:underline hover:text-black">
                           {post.title}
@@ -64,17 +65,12 @@ export default observer(function PostList() {
                           </div>
                         </dd>
                       </dl>
-                    </div>
+                    </NavLink>
                   </div>
                 </div>
                 <div className="absolute bottom-0 right-0">
                   <button name={post.id} onClick={(e) => handlePostDelete(e, post.id)} disabled={loading && target == post.id} className="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded">
                     {loading ? 'Deleting...' : 'Delete'}
-                  </button>
-                </div>
-                <div className="absolute bottom-0 right-20">
-                  <button name={post.id} onClick={() => postStore.selectPost(post.id)} disabled={loading && target == post.id} className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded">
-                    {loading ? 'Opening...' : 'View'}
                   </button>
                 </div>
               </div>

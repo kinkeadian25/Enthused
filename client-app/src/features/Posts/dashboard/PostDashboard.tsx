@@ -1,16 +1,21 @@
 import { observer } from "mobx-react-lite";
+import { useEffect } from "react";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
 import { useStore } from "../../../app/stores/store";
-import BlogPost from "../content/BlogPost";
-import PostsForm from "../postsform/PostsForm";
 import PostList from "./PostList";
 
 export default observer(function PostsDashboard() {
-  const { postStore: { selectedPost, editMode } } = useStore();
+  const { postStore} = useStore();
+
+  useEffect(() => {
+    postStore.loadPosts();
+  }, [postStore])
+
+  if (postStore.loadingInitial) return <LoadingComponent content=''/>
 
   return (
     <>
       <PostList />
-      {selectedPost ? (!editMode ? <BlogPost /> : <PostsForm />) : null}
     </>
   );
 });

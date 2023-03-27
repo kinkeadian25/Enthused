@@ -6,21 +6,28 @@ import { Post } from "../../../app/models/post";
 import { v4 as uuid } from "uuid";
 import { useStore } from "../../../app/stores/store";
 import { observer } from "mobx-react-lite";
+import { useParams } from "react-router-dom";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
 
 export default observer(function PostsForm() {
   const {postStore} = useStore();
-  const {selectedPost, closeForm, createPost, updatePost, loading} = postStore;
+  const {selectedPost, createPost, updatePost, 
+    loading, loadPost, loadingInitial} = postStore;
+  const {id} = useParams();
 
-  const initialState = selectedPost ?? {
+  const [post, setPost] = useState<Post>({
     id: "",
     title: "",
     summary: "",
     content: "",
     category: "",
     date: "",
-  };
+  });
 
-  const [post, setPost] = useState(initialState);
+  useEffect(() => {
+    if (id) loadPost(id).then(post => setPost(post!));
+  }, [id, loadPost]);
+
 
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
@@ -28,14 +35,14 @@ export default observer(function PostsForm() {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
   useEffect(() => {
-    if (post) {
-      setTitle(post.title);
-      setSummary(post.summary);
-      setCategory(post.category);
-      const contentState = convertFromRaw(JSON.parse(post.content));
-      setEditorState(EditorState.createWithContent(contentState));
-    }
-  }, [post]);
+  if (post && post.content) {
+    setTitle(post.title);
+    setSummary(post.summary);
+    setCategory(post.category);
+    const contentState = convertFromRaw(JSON.parse(post.content));
+    setEditorState(EditorState.createWithContent(contentState));
+  }
+}, [post]);
 
   const handleEditorStateChange = (editorState: EditorState) => {
     setEditorState(editorState);
@@ -61,7 +68,6 @@ export default observer(function PostsForm() {
       setSummary("");
       setCategory("");
       setEditorState(EditorState.createEmpty());
-      closeForm();
     } catch (error) {
       console.log(error);
     }
@@ -74,6 +80,8 @@ export default observer(function PostsForm() {
     setEditorState(EditorState.createEmpty());
   };
 
+  if (loadingInitial) return <LoadingComponent />;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <form
@@ -81,7 +89,7 @@ export default observer(function PostsForm() {
         onSubmit={handleSubmit}
       >
         <h1 className="text-2xl font-semibold text-gray-900 mb-4">
-          {post ? "Edit" : "Create"} a blog post
+          {post ? "Share" : "Fix"} your thoughts
         </h1>
         <div className="mb-4">
           <label
@@ -160,14 +168,6 @@ export default observer(function PostsForm() {
             type="submit"
           >
             Submit
-          </button>
-          <button
-            disabled={loading}
-            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2"
-            type="button"
-            onClick={closeForm}
-          >
-            Cancel
           </button>
         </div>
       </form>

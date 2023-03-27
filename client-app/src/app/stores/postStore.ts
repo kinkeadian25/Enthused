@@ -21,11 +21,11 @@ export default class PostStore {
     }
 
     loadPosts = async () => {
+        this.setLoadingInitial(true);
         try {
             const posts = await agent.Posts.list();
                 posts.forEach(post => {
-                    post.date = post.date.split('T')[0];
-                    this.postRegistry.set(post.id, post);
+                    this.setPost(post);
                 });
                 this.setLoadingInitial(false);
         } catch (error) {
@@ -34,25 +34,40 @@ export default class PostStore {
         }
     }
 
+    loadPost = async (id: string) => {
+        let post = this.getPost(id);
+        if (post) {
+            this.selectedPost = post;
+            return post;
+        }
+        else {
+            this.setLoadingInitial(true);
+            try {
+                post = await agent.Posts.details(id);
+                this.setPost(post);
+                runInAction(() => {
+                    this.selectedPost = post;
+                })
+                this.setLoadingInitial(false);
+                return post;
+            } catch (error) {
+                console.log(error);
+                this.setLoadingInitial(false);
+            }
+        }
+    }
+
+    private getPost = (id: string) => {
+        return this.postRegistry.get(id);
+    }
+
+    private setPost = (post: Post) => {
+        post.date = post.date.split('T')[0];
+        this.postRegistry.set(post.id, post);
+    }
+
     setLoadingInitial = (state: boolean) => {
         this.loadingInitial = state;
-    }
-
-    selectPost = (id: string) => {
-        this.selectedPost = this.postRegistry.get(id);
-    }
-
-    cancelSelectedPost = () => {
-        this.selectedPost = undefined;
-    }
-    
-    openForm = (id?: string) => {
-        id ? this.selectPost(id) : this.cancelSelectedPost();
-        this.editMode = true;
-    }
-
-    closeForm = () => {
-        this.editMode = false;
     }
 
     createPost = async (post: Post) => {
@@ -98,7 +113,6 @@ export default class PostStore {
             await agent.Posts.delete(id);
             runInAction(() => {
                 this.postRegistry.delete(id);
-                if (this.selectedPost?.id === id) this.cancelSelectedPost();
                 this.loading = false;
             })
         } catch (error) {

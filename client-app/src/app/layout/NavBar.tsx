@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
 import { useStore } from "../stores/store";
 
 
@@ -9,8 +10,6 @@ export default function NavBar() {
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
-
-  const {postStore} = useStore();
 
   return (
     <nav className="bg-indigo-300 shadow-lg">
@@ -23,18 +22,18 @@ export default function NavBar() {
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              <a href="/" className="text-gray-600 hover:text-gray-900">
+              <NavLink to='/' className="text-gray-600 hover:text-gray-900">
                 Home
-              </a>
-              <a href="/about" className="text-gray-600 hover:text-gray-900">
-                About
-              </a>
-              <button onClick={() => postStore.openForm} className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded">
-                Create Post
-                  </button>
-              <a href="/profile" className="text-gray-600 hover:text-gray-900">
+              </NavLink>
+              <NavLink to='/posts' className="text-gray-600 hover:text-gray-900">
+                Learn
+              </NavLink>
+              <NavLink to='createActivity' className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded">
+                Create
+              </NavLink>
+              <NavLink to="/profile" className="text-gray-600 hover:text-gray-900">
                 Profile
-              </a>
+              </NavLink>
             </div>
           </div>
           <div className="-mr-2 flex md:hidden">
@@ -81,30 +80,30 @@ export default function NavBar() {
       </div>
       <div className={isOpen ? "block" : "hidden md:hidden"}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <a
-            href="/"
+          <NavLink
+            to="/"
             className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
           >
             Home
-          </a>
-          <a
-            href="/about"
+          </NavLink>
+          <NavLink
+            to="/posts"
             className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
           >
-            About
-          </a>
-          <a
-            href="/blog"
+            Learn
+          </NavLink>
+          <NavLink
+            to="/createPost"
             className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
             >
-            Blog
-            </a>
-            <a
-                href="/profile"
+            Create
+            </NavLink>
+            <NavLink
+                to="/profile"
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
             >
-                Profile
-            </a>
+            Profile
+            </NavLink>
         </div>
         </div>
     </nav>
