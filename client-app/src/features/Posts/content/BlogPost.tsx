@@ -1,17 +1,16 @@
-import React from "react";
-import { Post } from "../../../app/models/post";
 import { convertFromRaw } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
+import { observer } from 'mobx-react-lite';
+import LoadingComponent from '../../../app/layout/LoadingComponent';
+import { useStore } from "../../../app/stores/store";
 
-interface Props {
-  post: Post;
-  cancelSelectPost: () => void;
-  openForm: (id?: string) => void;
-}
+export default observer(function BlogPost() {
+  const {postStore} = useStore();
+  const {selectedPost: post, openForm, cancelSelectedPost} = postStore;
 
-export default function BlogPost({ post, cancelSelectPost, openForm }: Props) {
-  const contentState = convertFromRaw(JSON.parse(post.content));
-  const contentHtml = stateToHTML(contentState);
+  if (!post) return <LoadingComponent />;
+
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -32,7 +31,9 @@ export default function BlogPost({ post, cancelSelectPost, openForm }: Props) {
         <div className="mt-6 text-gray-700">
           <p>{post.summary}</p>
         </div>
-        <div className="mt-6 text-gray-700" dangerouslySetInnerHTML={{ __html: contentHtml }}></div>
+        <div className="mt-6 text-gray-700">
+          <p>{post.content}</p>
+        </div>
         <footer className="mt-8">
           <div className="border-t border-gray-200 pt-4 pb-3">
             <div className="flex justify-end">
@@ -42,7 +43,7 @@ export default function BlogPost({ post, cancelSelectPost, openForm }: Props) {
               <button className="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 Remember
               </button>
-              <button onClick={cancelSelectPost} className="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              <button onClick={cancelSelectedPost} className="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 Close
               </button>
               <button onClick={() => openForm(post.id)} className="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -54,4 +55,4 @@ export default function BlogPost({ post, cancelSelectPost, openForm }: Props) {
       </article>
     </div>
   );
-}
+})

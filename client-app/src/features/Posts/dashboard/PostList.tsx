@@ -1,22 +1,27 @@
-import React from "react";
-import { Post } from "../../../app/models/post";
+import { observer } from "mobx-react-lite";
+import React, { useState, SyntheticEvent } from "react";
+import { useStore } from "../../../app/stores/store";
 
-interface Props {
-  posts: Post[];
-  selectPost: (id: string) => void;
-  deletePost: (id: string) => void;
-}
+export default observer(function PostList() {
+  const {postStore} = useStore();
+  const { deletePost, postsByDate, loading} = postStore;
 
-export default function PostList({ posts, selectPost, deletePost }: Props) {
+  const [target, setTarget] = useState(''); 
+
+  function handlePostDelete(e: SyntheticEvent<HTMLButtonElement>, id: string) {
+    setTarget(e.currentTarget.name);
+    deletePost(id);
+  }
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto my-8 px-4 sm:px-6 lg:px-8">
       <div className="flex justify-center">
         <div className="w-2/3">
           <div className="grid grid-cols-1 gap-4">
-            {posts.map((post) => (
+            {postsByDate.map((post) => (
               <div
                 key={post.id}
-                className="bg-white overflow-hidden shadow rounded-lg"
+                className="bg-indigo-300 overflow-hidden shadow-lg rounded-lg relative"
               >
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex items-center">
@@ -37,14 +42,14 @@ export default function PostList({ posts, selectPost, deletePost }: Props) {
                         />
                       </svg>
                     </div>
-                    <div className="ml-5 w-0 flex-1" onClick={() => selectPost(post.id)}>
+                    <div className="ml-5 w-0 flex-1" onClick={() => postStore.selectPost(post.id)}>
                       <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate hover:underline hover:text-black">
+                        <dt className="text-lg font-medium text-gray-500 truncate hover:underline hover:text-black">
                           {post.title}
                         </dt>
                         <dd className="flex items-baseline">
-                          <div className="text-lg font-semibold text-gray-900 hover:underline hover:text-black">
-                            {post.summary}
+                          <div className="text-sm font-semibold text-gray-900 hover:underline hover:text-black">
+                            {post.summary.split(" ").slice(0, 20).join(" ")}
                           </div>
                         </dd>
                         <dd className="mt-1 text-sm text-gray-500">
@@ -58,12 +63,19 @@ export default function PostList({ posts, selectPost, deletePost }: Props) {
                             </div>
                           </div>
                         </dd>
-                        <button onClick={() => deletePost(post.id)} className="mt-2 text-sm text-red-500 hover:text-red-700">
-                          Delete
-                        </button>
                       </dl>
                     </div>
                   </div>
+                </div>
+                <div className="absolute bottom-0 right-0">
+                  <button name={post.id} onClick={(e) => handlePostDelete(e, post.id)} disabled={loading && target == post.id} className="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded">
+                    {loading ? 'Deleting...' : 'Delete'}
+                  </button>
+                </div>
+                <div className="absolute bottom-0 right-20">
+                  <button name={post.id} onClick={() => postStore.selectPost(post.id)} disabled={loading && target == post.id} className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded">
+                    {loading ? 'Opening...' : 'View'}
+                  </button>
                 </div>
               </div>
             ))}
@@ -72,4 +84,5 @@ export default function PostList({ posts, selectPost, deletePost }: Props) {
       </div>
     </div>
   );
-}
+})
+

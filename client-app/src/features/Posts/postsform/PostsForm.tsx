@@ -2,18 +2,26 @@ import React, { useEffect, useState } from "react";
 import { convertFromRaw, convertToRaw, EditorState } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import axios from "axios";
 import { Post } from "../../../app/models/post";
 import { v4 as uuid } from "uuid";
+import { useStore } from "../../../app/stores/store";
+import { observer } from "mobx-react-lite";
 
-interface Props {
-  createOrEditPost: (post: Post) => void;
-  closeForm: () => void;
-  post: Post | undefined;
-  submitting: boolean;
-}
+export default observer(function PostsForm() {
+  const {postStore} = useStore();
+  const {selectedPost, closeForm, createPost, updatePost, loading} = postStore;
 
-export default function PostsForm({ createOrEditPost, closeForm, post }: Props) {
+  const initialState = selectedPost ?? {
+    id: "",
+    title: "",
+    summary: "",
+    content: "",
+    category: "",
+    date: "",
+  };
+
+  const [post, setPost] = useState(initialState);
+
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [category, setCategory] = useState("");
@@ -48,7 +56,7 @@ export default function PostsForm({ createOrEditPost, closeForm, post }: Props) 
       id,
     };
     try {
-      await createOrEditPost(newPost);
+      await post.id ? updatePost(newPost) : createPost(newPost);
       setTitle("");
       setSummary("");
       setCategory("");
@@ -147,12 +155,14 @@ export default function PostsForm({ createOrEditPost, closeForm, post }: Props) 
             Reset
           </button>
           <button
+            disabled={loading}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
           >
             Submit
           </button>
           <button
+            disabled={loading}
             className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2"
             type="button"
             onClick={closeForm}
@@ -163,6 +173,6 @@ export default function PostsForm({ createOrEditPost, closeForm, post }: Props) 
       </form>
     </div>
   );
-}
+});
 
 

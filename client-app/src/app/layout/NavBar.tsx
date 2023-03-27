@@ -1,18 +1,19 @@
 import React, { useState } from "react";
+import { useStore } from "../stores/store";
 
-interface Props {
-  openForm: () => void;
-}
 
-export default function NavBar({ openForm }: Props) {
+
+export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
+  const {postStore} = useStore();
+
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-indigo-300 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex-shrink-0 flex items-center">
@@ -28,9 +29,9 @@ export default function NavBar({ openForm }: Props) {
               <a href="/about" className="text-gray-600 hover:text-gray-900">
                 About
               </a>
-              <button onClick={openForm} className="text-gray-600 hover:text-gray-900">
-                Create Blog
-              </button>
+              <button onClick={() => postStore.openForm} className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded">
+                Create Post
+                  </button>
               <a href="/profile" className="text-gray-600 hover:text-gray-900">
                 Profile
               </a>

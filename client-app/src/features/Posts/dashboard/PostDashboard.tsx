@@ -1,33 +1,16 @@
-import React from "react";
-import { Post } from "../../../app/models/post";
+import { observer } from "mobx-react-lite";
+import { useStore } from "../../../app/stores/store";
 import BlogPost from "../content/BlogPost";
 import PostsForm from "../postsform/PostsForm";
 import PostList from "./PostList";
 
-interface Props {
-  posts: Post[];
-  selectedPost: Post | undefined;
-  selectPost: (id: string) => void;
-  cancelSelectPost: () => void;
-  editMode: boolean;
-  openForm: (id?: string) => void;
-  closeForm: () => void;
-  deletePost: (id: string) => void;
-  createOrEditPost: (post: Post) => void;
-  submitting: boolean;
-}
+export default observer(function PostsDashboard() {
+  const { postStore: { selectedPost, editMode } } = useStore();
 
-export default function PostsDashboard({ posts, selectedPost, selectPost, cancelSelectPost, editMode, closeForm, openForm, deletePost, createOrEditPost, submitting }: Props) {
   return (
     <>
-    <PostList posts={posts} selectPost={selectPost} deletePost={deletePost}/>
-    {selectedPost && !editMode &&
-    <BlogPost 
-    post={selectedPost} 
-    cancelSelectPost={cancelSelectPost} 
-    openForm={openForm}
-    />}
-    {editMode && <PostsForm closeForm={closeForm} post={selectedPost} createOrEditPost={createOrEditPost} submitting={submitting} />}
+      <PostList />
+      {selectedPost ? (!editMode ? <BlogPost /> : <PostsForm />) : null}
     </>
   );
-}
+});
