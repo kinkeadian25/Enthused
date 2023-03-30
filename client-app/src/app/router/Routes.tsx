@@ -1,5 +1,4 @@
 import { createBrowserRouter, RouteObject } from "react-router-dom";
-import HomePage from "../../features/home/HomePage";
 import BlogPost from "../../features/Posts/content/BlogPost";
 import PostDashboard from "../../features/Posts/dashboard/PostDashboard";
 import PostsForm from "../../features/Posts/postsform/PostsForm";
@@ -10,15 +9,12 @@ export const routes: RouteObject[] = [
         path: "/",
         element: <App />,
         children: [
-            {path: "", element: <HomePage />},
             {path: "posts", element: <PostDashboard />},
             {path: "posts/:id", element: <BlogPost />},
-            {path: "createPost", element: <PostsForm />},
-            {path: "manage/:id", element: <PostsForm />},
+            {path: "createPost", element: <PostsForm key='create'/>},
+            {path: "manage/:id", element: <PostsForm key='manage'/>},
         ]
-
     }
-
 ]
 
 export const router = createBrowserRouter(routes)

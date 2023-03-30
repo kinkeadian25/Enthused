@@ -6,14 +6,15 @@ import { Post } from "../../../app/models/post";
 import { v4 as uuid } from "uuid";
 import { useStore } from "../../../app/stores/store";
 import { observer } from "mobx-react-lite";
-import { useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import LoadingComponent from "../../../app/layout/LoadingComponent";
 
 export default observer(function PostsForm() {
   const {postStore} = useStore();
-  const {selectedPost, createPost, updatePost, 
+  const {createPost, updatePost, 
     loading, loadPost, loadingInitial} = postStore;
   const {id} = useParams();
+  const navigate = useNavigate();
 
   const [post, setPost] = useState<Post>({
     id: "",
@@ -63,7 +64,7 @@ export default observer(function PostsForm() {
       id,
     };
     try {
-      await post.id ? updatePost(newPost) : createPost(newPost);
+      await post.id ? updatePost(newPost).then(() => navigate(`/posts/${post.id}`)) : createPost(newPost).then(() => navigate(`/posts/${post.id}`));
       setTitle("");
       setSummary("");
       setCategory("");
@@ -71,13 +72,6 @@ export default observer(function PostsForm() {
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const handleReset = () => {
-    setTitle("");
-    setSummary("");
-    setCategory("");
-    setEditorState(EditorState.createEmpty());
   };
 
   if (loadingInitial) return <LoadingComponent />;
@@ -155,13 +149,15 @@ export default observer(function PostsForm() {
           />
         </div>
         <div className="flex justify-end">
+        <Link to="/posts">
           <button
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
             type="button"
-            onClick={handleReset}
           >
-            Reset
+            Cancel
           </button>
+          </Link>
+          <Link to="/posts">
           <button
             disabled={loading}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -169,6 +165,7 @@ export default observer(function PostsForm() {
           >
             Submit
           </button>
+          </Link>
         </div>
       </form>
     </div>

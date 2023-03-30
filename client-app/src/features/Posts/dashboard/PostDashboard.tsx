@@ -6,10 +6,11 @@ import PostList from "./PostList";
 
 export default observer(function PostsDashboard() {
   const { postStore} = useStore();
+  const {loadPosts, postRegistry} = postStore;
 
   useEffect(() => {
-    postStore.loadPosts();
-  }, [postStore])
+    if (postRegistry.size <= 1) loadPosts();
+  }, [loadPosts, postRegistry.size])
 
   if (postStore.loadingInitial) return <LoadingComponent content=''/>
 

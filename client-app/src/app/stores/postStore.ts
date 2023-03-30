@@ -2,14 +2,13 @@ import { makeAutoObservable, runInAction } from "mobx";
 import agent from "../api/agent";
 import { Post } from "../models/post";
 import { v4 as uuid } from 'uuid';
-import { threadId } from "worker_threads";
 
 export default class PostStore {
     postRegistry = new Map<string, Post>();
     selectedPost: Post | undefined = undefined;
     editMode = false;
     loading = false;
-    loadingInitial = true;
+    loadingInitial = false;
 
     constructor() {
         makeAutoObservable(this)

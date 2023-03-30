@@ -69,7 +69,7 @@ export default observer(function PostList() {
                   </div>
                 </div>
                 <div className="absolute bottom-0 right-0">
-                  <button name={post.id} onClick={(e) => handlePostDelete(e, post.id)} disabled={loading && target == post.id} className="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded">
+                  <button name={post.id} onClick={(e) => handlePostDelete(e, post.id)} disabled={loading && target === post.id} className="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded">
                     {loading ? 'Deleting...' : 'Delete'}
                   </button>
                 </div>
